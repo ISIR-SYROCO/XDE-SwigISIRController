@@ -4,7 +4,7 @@
 from distutils.core import setup, Extension
 from distutils.command.build_py import build_py
 import commands
-
+import os
 
 
 
@@ -84,20 +84,14 @@ if xdecore is not None:
 
 # check for optional package: orocos
 if orocos is not None:
-    import os
-    import tempfile
-    cwd = os.getcwd()
-    os.chdir(tempfile.gettempdir())
-    orocos_results = commands.getoutput("cmake "+cwd+os.sep+"src"+os.sep+"orocos")
-    orocos_data = {}
-    orocos_data['include_dirs'] = orocos_results.split("\n")[-6].split(";")
-#    orocos_data['libraries']    = orocos_results.split("\n")[-5].split(";") #seems that the lib is not available, but also useless, the compilation works fine...!?!
-    other_compiler_args.extend(   orocos_results.split("\n")[-4].split(";"))
-
-    os.chdir(cwd)
-    for elem in ["include_dirs"]:
-        packages_data[elem].extend(orocos_data[elem])
+    incdir = commands.getoutput("pkg-config --variable=includedir orocos-rtt-gnulinux")
+    libdir = commands.getoutput("pkg-config --variable=libdir orocos-rtt-gnulinux")
+    packages_data["include_dirs"].extend([incdir, incdir+os.sep+"rtt"])
+    packages_data["library_dirs"].extend([libdir])
+    packages_data["libraries"].extend(["orocos-rtt-gnulinux"])
+    other_compiler_args.extend(["-DOROCOS_TARGET=gnulinux"])
     other_swig_opt.append("-DOROCOS_IS_AVAILABLE")
+
 
 
 # SwigISIRController
