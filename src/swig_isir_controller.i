@@ -24,6 +24,24 @@
 
 %include "interfaces/typemap_eigen_lgsm.i"
 
+
+//Management of exceptions raised by XDE-SwigISIRController
+%include exception.i
+%exception { 
+    try {
+        $action
+    } catch(std::runtime_error &e) {
+        std::string err_msg("std::runtime_error exception raised by XDE-SwigISIRController:\n");
+        err_msg += e.what();
+        err_msg += "\n";
+        SWIG_exception(SWIG_RuntimeError, err_msg.c_str());
+    } catch (...) {
+        SWIG_exception(SWIG_RuntimeError, "unknown exception raised by XDE-wigISIRController!");
+    }
+}
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // orc::NamedInstance base class interface
@@ -164,6 +182,8 @@ namespace Eigen {}
 %include "interfaces/isir_controller_xde_model.i"
 
 #endif
+
+
 
 
 
