@@ -37,7 +37,7 @@ if orocos is not None:
 
 
 # SwigISIRController
-_swig_swig_isir_controller = Extension("swig_isir_controller._swig_isir_controller",
+_swig_swig_isir_controller = Extension("_swig_isir_controller",
                    ["src/swig_isir_controller.i"],
                    swig_opts = ["-c++"] + ["-I"+p for p in packages_data['include_dirs']] + other_swig_opt,
                    extra_compile_args = ["-fpermissive"] + other_compiler_args,
@@ -48,8 +48,8 @@ _swig_swig_isir_controller = Extension("swig_isir_controller._swig_isir_controll
 
 #to force the package building extension before all we change the script_args list:
 import sys
-sys.argv.remove("develop")
-script_args= ["build_ext", "install"] + sys.argv[1:] # To force a first build of the Extension(s)
+#sys.argv.remove("develop")
+script_args= ["build_ext", "--build-lib=src"] + sys.argv[1:] # To force a first build of the Extension(s)
 
 package_name = "swig_isir_controller"
 # py setup
@@ -61,6 +61,7 @@ dist = setup(name   = "swig_isir_controller",
         ext_modules = [_swig_swig_isir_controller],
         packages    = [package_name],
         package_dir = {package_name:'src'},
+        package_data = {package_name:['*.so']},
         cmdclass=cmdclass,
 
         script_args = script_args,
