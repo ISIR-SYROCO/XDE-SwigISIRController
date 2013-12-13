@@ -19,6 +19,8 @@
 #include "orcisir/Constraints/ContactAvoidanceConstraint.h"
 %}
 
+%feature("autodoc", "1");
+%include "interfaces/isir_controller_docstrings.i"
 
 %include "std_string.i"
 
