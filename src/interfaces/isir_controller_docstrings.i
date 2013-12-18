@@ -1353,8 +1353,7 @@ See orcisir::ContactAvoidanceFunction for more information.
 
 C++ includes: ContactAvoidanceConstraint.h ";
 
-%feature("docstring")  orcisir::ReducedContactAvoidanceFunction::Reduc
-edContactAvoidanceFunction "
+%feature("docstring")  orcisir::ReducedContactAvoidanceFunction::ReducedContactAvoidanceFunction "
 ReducedContactAvoidanceFunction::ReducedContactAvoidanceFunction(const
 orc::Model &model, const ISIRDynamicFunction &dynamicEquation)
 
@@ -1367,8 +1366,7 @@ Parameters:
 model:  The xde model on which we will update the dynamic parameters
 ";
 
-%feature("docstring")  orcisir::ReducedContactAvoidanceFunction::~Redu
-cedContactAvoidanceFunction "
+%feature("docstring")  orcisir::ReducedContactAvoidanceFunction::~ReducedContactAvoidanceFunction "
 ReducedContactAvoidanceFunction::~ReducedContactAvoidanceFunction()
 
 Destructor ";
