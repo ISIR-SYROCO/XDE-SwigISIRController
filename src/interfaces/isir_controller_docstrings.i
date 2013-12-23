@@ -1386,8 +1386,9 @@ See orcisir::ContactAvoidanceFunction for more information.
 
 C++ includes: ContactAvoidanceConstraint.h ";
 
-%feature("docstring")  orcisir::ReducedContactAvoidanceFunction::ReducedContactAvoidanceFunction "
-ReducedContactAvoidanceFunction::ReducedContactAvoidanceFunction(const
+%feature("docstring")
+orcisir::ReducedContactAvoidanceFunction::ReducedContactAvoidanceFunction
+"ReducedContactAvoidanceFunction::ReducedContactAvoidanceFunction(const
 orc::Model &model, const ISIRDynamicFunction &dynamicEquation)
 
 Initialize a contact avoidance function designed for the reduced
@@ -1401,8 +1402,9 @@ model:  The orc::Model on which we will update the dynamic parameters
 dynamicEquation:  The dynamic equation of motion that can compute
 matrices for the reduced problem ";
 
-%feature("docstring")  orcisir::ReducedContactAvoidanceFunction::~ReducedContactAvoidanceFunction "
-ReducedContactAvoidanceFunction::~ReducedContactAvoidanceFunction()
+%feature("docstring")
+orcisir::ReducedContactAvoidanceFunction::~ReducedContactAvoidanceFunction
+"ReducedContactAvoidanceFunction::~ReducedContactAvoidanceFunction()
 
 Destructor ";
 
