@@ -101,7 +101,7 @@ Initialize the contact avoidance constraint function.
 Parameters:
 -----------
 
-model:  The xde model on which we will get the dynamic parameters
+model:  The orc::Model on which we will get the dynamic parameters
 
 var:  The problem variable that will be used to write this constraint
 
@@ -178,29 +178,6 @@ _distObst:  The relative distance of obstacle avoidance
 _velObst:  The relative velocity of obstacle avoidance ";
 
 
-// File: classorcisir_1_1_fc_quadratic_function.xml
-%feature("docstring") orcisir::FcQuadraticFunction "";
-
-%feature("docstring")
-orcisir::FcQuadraticFunction::FcQuadraticFunction "orcisir::FcQuadraticFunction::FcQuadraticFunction(orc::Variable &x) ";
-
-%feature("docstring")
-orcisir::FcQuadraticFunction::~FcQuadraticFunction "virtual
-orcisir::FcQuadraticFunction::~FcQuadraticFunction() ";
-
-%feature("docstring")
-orcisir::FcQuadraticFunction::doUpdateInputSizeBegin "void
-orcisir::FcQuadraticFunction::doUpdateInputSizeBegin() ";
-
-%feature("docstring")  orcisir::FcQuadraticFunction::updateHessian "void orcisir::FcQuadraticFunction::updateHessian() const ";
-
-%feature("docstring")  orcisir::FcQuadraticFunction::updateq "void
-orcisir::FcQuadraticFunction::updateq() const ";
-
-%feature("docstring")  orcisir::FcQuadraticFunction::updater "void
-orcisir::FcQuadraticFunction::updater() const ";
-
-
 // File: classorcisir_1_1_full_contact_avoidance_function.xml
 %feature("docstring") orcisir::FullContactAvoidanceFunction "
 
@@ -221,7 +198,7 @@ formalism.
 Parameters:
 -----------
 
-model:  The xde model on which we will update the dynamic parameters
+model:  The orc::Model on which we will update the dynamic parameters
 ";
 
 %feature("docstring")
@@ -249,7 +226,7 @@ Initialize a joint limits function designed for the full formalism.
 Parameters:
 -----------
 
-model:  The xde model on which we will update the dynamic parameters
+model:  The orc::Model on which we will update the dynamic parameters
 
 It is connected with the model and invalidates $ \\\\b $ when
 orc::EVT_CHANGE_VALUE is raised. Furthermore, it computes the Jacobian
@@ -277,7 +254,7 @@ ISIRConstraint.h ";
 // File: classorcisir_1_1_i_s_i_r_controller.xml
 %feature("docstring") orcisir::ISIRController "
 
-ISIR Controller based on LQP solver for the xde framework.
+ISIR Controller based on LQP solver for the orc framework.
 
 C++ includes: ISIRController.h ";
 
@@ -303,32 +280,58 @@ variable is $ [ \\\\torque \\\\; \\\\force_c ] $) ";
 
 %feature("docstring")  orcisir::ISIRController::~ISIRController "orcisir::ISIRController::~ISIRController()
 
-Destructor ";
+Destructor of ISIR controller.
+
+It disconnects all the tasks connected to the controller, then it
+disconnects the inner objectives that minimize the problem variables,
+and finally it disconnects the dynamic equation constraint (if
+needed). ";
 
 %feature("docstring")  orcisir::ISIRController::getModel "Model &
 orcisir::ISIRController::getModel()
 
-the inner model used to construct this controller instance ";
+return the inner model the inner model used to construct this
+controller instance ";
 
 %feature("docstring")  orcisir::ISIRController::getSolver "ISIRSolver
 & orcisir::ISIRController::getSolver()
 
-the inner solver used to construct this controller instance ";
+return the inner solver the inner solver used to construct this
+controller instance ";
 
 %feature("docstring")  orcisir::ISIRController::isUsingReducedProblem
 "bool orcisir::ISIRController::isUsingReducedProblem()
 
 true if variable of reduced problem ( $ [ \\\\torque \\\\; \\\\force_c
-] $) is considered ";
+] $) is considered, or false if it uses the variable of the full one (
+$ [ \\\\ddq \\\\; \\\\torque \\\\; \\\\force_c ] $). ";
 
 %feature("docstring")
 orcisir::ISIRController::setVariableMinimizationWeights "void
 orcisir::ISIRController::setVariableMinimizationWeights(double w_ddq,
-double w_tau, double w_fc) ";
+double w_tau, double w_fc)
+
+Set weights for the objectives that minimize the norm of the problem
+variables: $ [ \\\\ddq \\\\; \\\\torque \\\\; \\\\force_c ] $
+
+Parameters:
+-----------
+
+w_ddq:  weight for the minimization of $ \\\\ddq $
+
+w_tau:  weight for the minimization of $ \\\\torque $
+
+w_fc:  weight for the minimization of $ \\\\force_c $ ";
 
 %feature("docstring")  orcisir::ISIRController::takeIntoAccountGravity
 "void orcisir::ISIRController::takeIntoAccountGravity(bool useGrav)
-";
+
+Whether to take into account gavity in the dynamic equation of motion
+
+Parameters:
+-----------
+
+useGrav:   true if gravity is enable, false otherwise ";
 
 %feature("docstring")
 orcisir::ISIRController::writePerformanceInStream "void
@@ -345,21 +348,25 @@ information
 
 addCommaAtEnd:  If true, add a comma at the end of the stream. If
 false, it means that this is the end of the json file, nothing will be
-added after that, no comma is added.
+added after that.
 
-See orcisir::Orocos_ISIRController::getPerformances() to know more.
-Here it saves:
+See orcisir::ISIRController::getPerformances() to know more. Here it
+saves:
 
 controller_update_tasks
 
-controller_solve_problem ";
+controller_solve_problem
+
+solver_prepare
+
+solver_solve ";
 
 %feature("docstring")  orcisir::ISIRController::getPerformances "std::string orcisir::ISIRController::getPerformances() const
 
 Get information about performances through a string.
 
 Information are saved in a JSON way (http://www.json.org/). It returns
-a of dictionnary on the form:
+a dictionnary of the form:
 
 where performance_info are:
 
@@ -372,39 +379,70 @@ solver_prepare
 solver_solve
 
 See orcisir::ISIRController::writePerformanceInStream(std::ostream&,
-bool) and orcisir::ISIRSolver::writePerformanceInStream(std::ostream&,
-bool). ";
+bool) constand
+orcisir::ISIRSolver::writePerformanceInStream(std::ostream&, bool). ";
 
 %feature("docstring")  orcisir::ISIRController::addConstraint "void
 orcisir::ISIRController::addConstraint(orc::LinearConstraint
-&constraint) const ";
+&constraint) const
+
+add a Linear constraint that is equivalent for the full & reduced
+problems. ";
 
 %feature("docstring")  orcisir::ISIRController::removeConstraint "void orcisir::ISIRController::removeConstraint(orc::LinearConstraint
-&constraint) const ";
+&constraint) const
+
+remove a Linear constraint that is equivalent for the full & reduced
+problems. ";
 
 %feature("docstring")  orcisir::ISIRController::addConstraint "void
 orcisir::ISIRController::addConstraint(ISIRConstraint &constraint)
-const ";
+const
+
+add a Linear constraint that has different expressions, depending on
+the problem type.
+
+In this case, the constraint needs to be connected to the controller
+to get the matrices for the problem reduction. See
+orcisir::ISIRConstraint for more info. ";
 
 %feature("docstring")  orcisir::ISIRController::removeConstraint "void orcisir::ISIRController::removeConstraint(ISIRConstraint
-&constraint) const ";
+&constraint) const
+
+add a Linear constraint that has different expressions, depending on
+the problem type.
+
+In this case, the constraint needs to be disconnected from the
+controller. See orcisir::ISIRConstraint for more info. ";
 
 %feature("docstring")  orcisir::ISIRController::createISIRTask "ISIRTask & orcisir::ISIRController::createISIRTask(const std::string
-&name, const Feature &feature, const Feature &featureDes) const ";
+&name, const Feature &feature, const Feature &featureDes) const
+
+Create an ISIRTask.
+
+an ISIRTask instance that is a dynamic_cast of the task returned by
+orc::Controller::createTask(const std::string& name, const Feature&
+feature, const Feature& featureDes) const ";
 
 %feature("docstring")  orcisir::ISIRController::createISIRTask "ISIRTask & orcisir::ISIRController::createISIRTask(const std::string
-&name, const Feature &feature) const ";
+&name, const Feature &feature) const
+
+Create an ISIRTask.
+
+an ISIRTask instance that is a dynamic_cast of the task returned by
+orc::Controller::createTask(const std::string& name, const Feature&
+feature) const ";
 
 %feature("docstring")  orcisir::ISIRController::createISIRContactTask
 "ISIRTask & orcisir::ISIRController::createISIRContactTask(const
 std::string &name, const PointContactFeature &feature, double mu,
-double margin) const ";
+double margin) const
 
+Create an ISIRContactTask.
 
-// File: class_isir_debug_trace.xml
-%feature("docstring") IsirDebugTrace "C++ includes: ISIRDebug.h ";
-
-%feature("docstring")  IsirDebugTrace::IsirDebugTrace "IsirDebugTrace::IsirDebugTrace(std::ostream &os) ";
+an ISIRTask instance that is a dynamic_cast of the task returned by
+orc::Controller::createContactTask(const std::string& name, const
+PointContactFeature& feature, double mu, double margin) const ";
 
 
 // File: classorcisir_1_1_i_s_i_r_dynamic_function.xml
@@ -438,7 +476,7 @@ Initialize a dynamic equation of motion function.
 Parameters:
 -----------
 
-model:  The xde model on which we will update the dynamic parameters
+model:  The orc::Model on which we will update the dynamic parameters
 
 It is connected with the model on \"orc::EVT_CHANGE_VALUE\", meaning
 that a,y modification in the model will invalidate this linear
@@ -597,8 +635,7 @@ solver, not directly added to the task, and the Task class of the xde
 framework may have been used instead of this new class. But I think
 the level is the same concept as the weight (an importance), so I add
 it direcly in the task class, like the weight. Furthermore, writting
-this class helps me to better understand the xde framework.  Concrete
-class are orcisir::ISIRFullTask and orcisir::ISIRReducedTask .
+this class helps me to better understand the xde framework.
 
 C++ includes: ISIRTask.h ";
 
@@ -610,9 +647,10 @@ Initialize a new ISIR Task.
 Parameters:
 -----------
 
-name:  The name of the task
+taskName:  The name of the task
 
-model:  The xde model on which we will update the dynamic parameters
+innerModel:  The orc::Model on which we will update the dynamic
+parameters
 
 feature:  The task feature, meaning what we want to control
 
@@ -627,9 +665,10 @@ Initialize a new ISIR Task.
 Parameters:
 -----------
 
-name:  The name of the task
+taskName:  The name of the task
 
-model:  The xde model on which we will update the dynamic parameters
+innerModel:  The orc::Model on which we will update the dynamic
+parameters
 
 feature:  The task feature, meaning what we want to control ";
 
@@ -788,7 +827,7 @@ Initialize the joint limit constraint function.
 Parameters:
 -----------
 
-model:  The xde model on which we will get the dynamic parameters
+model:  The orc::Model on which we will get the dynamic parameters
 
 var:  The problem variable that will be used to write this constraint
 
@@ -800,7 +839,16 @@ or reduced $ \\\\x = [ \\\\torque \\\\; \\\\force_c ] $:
 
 orcisir::FullJointLimitFunction
 
-orcisir::ReducedJointLimitFunction ";
+orcisir::ReducedJointLimitFunction
+
+The function is on the form: | O -I | | ddqmax | | O I | ddq + |
+ddqmin |
+
+where O (nx6) is defined if the model has a free-floating base (we
+cannot limit the range of this \"joint\"), else O is a void matrix
+(nx0)
+
+The associated constraint is: A ddq + b >= 0 ";
 
 %feature("docstring")
 orcisir::JointLimitFunction::~JointLimitFunction "JointLimitFunction::~JointLimitFunction()
@@ -956,12 +1004,7 @@ C++ includes: OneLevelSolver.h ";
 
 %feature("docstring")  orcisir::OneLevelSolver::OneLevelSolver "OneLevelSolver::OneLevelSolver()
 
-Constructor of the abstract one level solver.
-
-Parameters:
------------
-
-m:  The Model of the robot ";
+Constructor of the abstract one level solver. ";
 
 %feature("docstring")  orcisir::OneLevelSolver::~OneLevelSolver "OneLevelSolver::~OneLevelSolver()
 
@@ -996,7 +1039,7 @@ Actually does nothing. ";
 Solver class that only consider one level of importance for all tasks
 using QLD.
 
-It uses a linear quadratic program which is included in the xde
+It uses a linear quadratic program which is included in the orc
 framework.
 
 QLD solve the following problem:
@@ -1018,12 +1061,7 @@ C++ includes: OneLevelSolver.h ";
 %feature("docstring")
 orcisir::OneLevelSolverWithQLD::OneLevelSolverWithQLD "OneLevelSolverWithQLD::OneLevelSolverWithQLD()
 
-Instanciate a concrete one level solver with QLD.
-
-Parameters:
------------
-
-m:  The Model of the robot ";
+Instanciate a concrete one level solver with QLD. ";
 
 %feature("docstring")
 orcisir::OneLevelSolverWithQLD::~OneLevelSolverWithQLD "OneLevelSolverWithQLD::~OneLevelSolverWithQLD()
@@ -1052,12 +1090,7 @@ C++ includes: OneLevelSolver.h ";
 %feature("docstring")
 orcisir::OneLevelSolverWithQuadProg::OneLevelSolverWithQuadProg "OneLevelSolverWithQuadProg::OneLevelSolverWithQuadProg()
 
-Instanciate a concrete one level solver with Quadprog++.
-
-Parameters:
------------
-
-m:  The Model of the robot ";
+Instanciate a concrete one level solver with Quadprog++. ";
 
 %feature("docstring")
 orcisir::OneLevelSolverWithQuadProg::~OneLevelSolverWithQuadProg "OneLevelSolverWithQuadProg::~OneLevelSolverWithQuadProg()
@@ -1107,7 +1140,7 @@ Eigen::VectorXd & orcisir::PartialModelState::tau() const ";
 A abstract partial state.
 
 This class is greatly inspired from the FullState class defined in the
-xde framework.
+orc framework.
 
 C++ includes: ISIRPartialState.h ";
 
@@ -1151,7 +1184,7 @@ Eigen::VectorXd& orcisir::PartialState::tau() const =0 ";
 A partial state feature.
 
 This class is greatly inspired from the FullStateFeature class defined
-in the xde framework.
+in the orc framework.
 
 C++ includes: ISIRFeature.h ";
 
@@ -1353,8 +1386,9 @@ See orcisir::ContactAvoidanceFunction for more information.
 
 C++ includes: ContactAvoidanceConstraint.h ";
 
-%feature("docstring")  orcisir::ReducedContactAvoidanceFunction::ReducedContactAvoidanceFunction "
-ReducedContactAvoidanceFunction::ReducedContactAvoidanceFunction(const
+%feature("docstring")
+orcisir::ReducedContactAvoidanceFunction::ReducedContactAvoidanceFunction
+"ReducedContactAvoidanceFunction::ReducedContactAvoidanceFunction(const
 orc::Model &model, const ISIRDynamicFunction &dynamicEquation)
 
 Initialize a contact avoidance function designed for the reduced
@@ -1363,11 +1397,14 @@ formalism.
 Parameters:
 -----------
 
-model:  The xde model on which we will update the dynamic parameters
-";
+model:  The orc::Model on which we will update the dynamic parameters
 
-%feature("docstring")  orcisir::ReducedContactAvoidanceFunction::~ReducedContactAvoidanceFunction "
-ReducedContactAvoidanceFunction::~ReducedContactAvoidanceFunction()
+dynamicEquation:  The dynamic equation of motion that can compute
+matrices for the reduced problem ";
+
+%feature("docstring")
+orcisir::ReducedContactAvoidanceFunction::~ReducedContactAvoidanceFunction
+"ReducedContactAvoidanceFunction::~ReducedContactAvoidanceFunction()
 
 Destructor ";
 
@@ -1391,7 +1428,10 @@ Initialize a joint limits function designed for the reduced formalism.
 Parameters:
 -----------
 
-model:  The xde model on which we will update the dynamic parameters
+model:  The orc::Model on which we will update the dynamic parameters
+
+dynamicEquation:  The dynamic equation of motion that can compute
+matrices for the reduced problem
 
 It is connected with the model and invalidates all when
 orc::EVT_CHANGE_VALUE is raised. Furthermore, it computes the Jacobian
@@ -1458,9 +1498,9 @@ Initialize a torque limit inequality function.
 Parameters:
 -----------
 
-model:  The xde model on which we will get the dynamic parameters
+model:  The orc::Model on which we will get the dynamic parameters
 
-It initialize the Jacobian of the linear function, $ \\\\A $ which is
+It initializes the Jacobian of the linear function, $ \\\\A $ which is
 constant. ";
 
 %feature("docstring")
@@ -1486,22 +1526,6 @@ Get the torque limit.
 The torque limit $ \\\\torque_{max} $ ";
 
 
-// File: classorcisir_1_1_variable_chi_function.xml
-%feature("docstring") orcisir::VariableChiFunction "";
-
-%feature("docstring")
-orcisir::VariableChiFunction::VariableChiFunction "orcisir::VariableChiFunction::VariableChiFunction(orc::Variable &x,
-int dimension) ";
-
-%feature("docstring")
-orcisir::VariableChiFunction::doUpdateInputSizeBegin "void
-orcisir::VariableChiFunction::doUpdateInputSizeBegin() ";
-
-%feature("docstring")
-orcisir::VariableChiFunction::doUpdateInputSizeEnd "void
-orcisir::VariableChiFunction::doUpdateInputSizeEnd() ";
-
-
 // File: namespaceorc.xml
 
 
@@ -1511,76 +1535,81 @@ orcisir::VariableChiFunction::doUpdateInputSizeEnd() ";
 &robotName) ";
 
 
-// File: _contact_avoidance_constraint_8h.xml
-
-
-// File: _i_s_i_r_constraint_8h.xml
-
-
-// File: _joint_limit_constraint_8h.xml
-
-
-// File: _torque_limit_constraint_8h.xml
-
-
-// File: _i_s_i_r_feature_8h.xml
-
-
-// File: _i_s_i_r_partial_state_8h.xml
-
-
-// File: _i_s_i_r_controller_8h.xml
-
-
-// File: _i_s_i_r_debug_8h.xml
-
-
-// File: _model_8h.xml
-
-
-// File: _performances_8h.xml
-
-
-// File: _i_s_i_r_solver_8h.xml
-
-
-// File: _one_level_solver_8h.xml
-
-
-// File: _i_s_i_r_task_8h.xml
-
-
 // File: _contact_avoidance_constraint_8cpp.xml
+
+
+// File: _contact_avoidance_constraint_8h.xml
 
 
 // File: _i_s_i_r_constraint_8cpp.xml
 
 
-// File: _joint_limit_constraint_8cpp.xml
-
-
-// File: _torque_limit_constraint_8cpp.xml
-
-
-// File: _i_s_i_r_feature_8cpp.xml
-
-
-// File: _i_s_i_r_partial_state_8cpp.xml
+// File: _i_s_i_r_constraint_8h.xml
 
 
 // File: _i_s_i_r_controller_8cpp.xml
 
 
+// File: _i_s_i_r_controller_8h.xml
+
+
 // File: _i_s_i_r_debug_8cpp.xml
+%feature("docstring")  isirDEBUGFLOW "IsirDebugTrace
+isirDEBUGFLOW(std::cout) ";
+
+
+// File: _i_s_i_r_debug_8h.xml
+
+
+// File: _i_s_i_r_feature_8cpp.xml
+
+
+// File: _i_s_i_r_feature_8h.xml
+
+
+// File: _i_s_i_r_partial_state_8cpp.xml
+
+
+// File: _i_s_i_r_partial_state_8h.xml
 
 
 // File: _i_s_i_r_solver_8cpp.xml
 
 
-// File: _one_level_solver_8cpp.xml
+// File: _i_s_i_r_solver_8h.xml
 
 
 // File: _i_s_i_r_task_8cpp.xml
+
+
+// File: _i_s_i_r_task_8h.xml
+
+
+// File: _joint_limit_constraint_8cpp.xml
+
+
+// File: _joint_limit_constraint_8h.xml
+
+
+// File: mainpage_8dox.xml
+
+
+// File: _model_8h.xml
+
+
+// File: _one_level_solver_8cpp.xml
+
+
+// File: _one_level_solver_8h.xml
+
+
+// File: _performances_8h.xml
+
+
+// File: _torque_limit_constraint_8cpp.xml
+
+
+// File: _torque_limit_constraint_8h.xml
 
 
 // File: group__constraint.xml
@@ -1598,22 +1627,40 @@ orcisir::VariableChiFunction::doUpdateInputSizeEnd() ";
 // File: group__task.xml
 
 
+// File: sec_transform_formalism.xml
+
+
+// File: page_task.xml
+
+
+// File: page_walking_task.xml
+
+
+// File: proof_walk_matrices.xml
+
+
+// File: page_walk_implementation.xml
+
+
+// File: page_bib_ref.xml
+
+
 // File: todo.xml
-
-
-// File: dir_3a0377ece039b18ab0bd8044527db54a.xml
 
 
 // File: dir_012677b4836afffff7730d56ce0ef360.xml
 
 
+// File: dir_3a0377ece039b18ab0bd8044527db54a.xml
+
+
 // File: dir_3c7fb145e6bdd445ac799c48d65bede1.xml
 
 
-// File: dir_9e3ca8e33ce48e6ffff082202df76aad.xml
-
-
 // File: dir_3d67e2cbcfbfed8683a66faed34fac84.xml
+
+
+// File: dir_9e3ca8e33ce48e6ffff082202df76aad.xml
 
 
 // File: dir_76ca5284cc03fef12a8c7d640aa4bbf2.xml
@@ -1628,23 +1675,26 @@ orcisir::VariableChiFunction::doUpdateInputSizeEnd() ";
 // File: dir_76d8aae74bb2115dfe5b1fa222416e5c.xml
 
 
-// File: dir_0752467cf7b9f1ad0895fe0358616fd6.xml
-
-
 // File: dir_3e2dff282e45a899f334a09eac9bb1c5.xml
+
+
+// File: dir_0752467cf7b9f1ad0895fe0358616fd6.xml
 
 
 // File: dir_64e319e61d32cb94500207c4e20ed02f.xml
 
 
-// File: dir_f81d3f1ba49a3898b83267a7597fece7.xml
-
-
 // File: dir_7b629eeb491a08c0c975c5e4d1b02e13.xml
+
+
+// File: dir_f81d3f1ba49a3898b83267a7597fece7.xml
 
 
 // File: dir_ef4c8f334dfd97d664e32a0d11b67d12.xml
 
 
 // File: dir_1bb70fe7f43bb7cc9ad861a3f11da063.xml
+
+
+// File: indexpage.xml
 
