@@ -1,62 +1,4 @@
-#! /usr/bin/env python
-
-# System imports
-from distutils.core import setup, Extension
-from distutils.command.build_py import build_py
-import commands
-import os
-
-
-
-flag_map = {'-I': 'include_dirs', '-L': 'library_dirs', '-l': 'libraries'}
-
-def get_additional_include_dir_from_env():
-    kw = {'include_dirs':[], 'library_dirs':[], 'libraries':[]}
-    for token in commands.getoutput("echo $CPLUS_INCLUDE_PATH").split(":"):
-        if token != "":
-            kw['include_dirs'].append(token)
-    return kw
-
-# define pkgconfig return data
-def pkgconfig(pkgname, required=True):
-
-    if commands.getoutput("pkg-config --exists "+pkgname+" ; echo $?") == "0":
-        print "-- "+pkgname + " found"
-    else:
-        print "-- "+pkgname + " not found"
-        if required:
-            raise ValueError("  -- This package ("+pkgname+") is required.")
-        return None
-    kw = {'include_dirs':[], 'library_dirs':[], 'libraries':[], "compiler_options":[]}
-    for token in commands.getoutput("pkg-config --libs --cflags "+pkgname).split():
-        if token[:2] in flag_map:
-            kw[flag_map[token[:2]]].append(token[2:])
-#        else:
-#            print "token: '"+token+"' not taken into account"
-    return kw
-
-
-def get_package_from_build_type(pkgname, required=True, Debug=False, dbg_postfix="_dbg"):
-    if Debug:
-        res = pkgconfig(pkgname+dbg_postfix, False)
-        if res is None:
-            print "-- looking for release version of package:"
-            return pkgconfig(pkgname+dbg_postfix, required)
-        else:
-            return res
-    else:
-        return pkgconfig(pkgname+dbg_postfix, required)
-
-
-def get_packages_data(lpkg):
-    kw = {'include_dirs':[], 'library_dirs':[], 'libraries':[]}
-    for pkg in lpkg:
-        for n in kw:
-            kw[n].extend(pkg[n])
-    return kw
-
-
-
+from IsirPythonTools import *
 
 # try to find interesting module
 eigen_lgsm             = pkgconfig("eigen_lgsm", True)
@@ -95,7 +37,7 @@ if orocos is not None:
 
 
 # SwigISIRController
-_swig_swig_isir_controller = Extension("swig_isir_controller._swig_isir_controller",
+_swig_swig_isir_controller = Extension("_swig_isir_controller",
                    ["src/swig_isir_controller.i"],
                    swig_opts = ["-c++"] + ["-I"+p for p in packages_data['include_dirs']] + other_swig_opt,
                    extra_compile_args = ["-fpermissive"] + other_compiler_args,
@@ -106,8 +48,10 @@ _swig_swig_isir_controller = Extension("swig_isir_controller._swig_isir_controll
 
 #to force the package building extension before all we change the script_args list:
 import sys
-script_args= ["build_ext"] + sys.argv[1:] # To force a first build of the Extension(s)
+#sys.argv.remove("develop")
+script_args= ["build_ext", "--build-lib=src"] + sys.argv[1:] # To force a first build of the Extension(s)
 
+package_name = "swig_isir_controller"
 # py setup
 dist = setup(name   = "swig_isir_controller",
         description = "Swig library to all the element available in orcisir_ISIRController.",
@@ -115,8 +59,10 @@ dist = setup(name   = "swig_isir_controller",
         url         = 'https://github.com/XDE-ISIR/XDE-SwigISIRController',
         version     = "0.1",
         ext_modules = [_swig_swig_isir_controller],
-        packages    = ["swig_isir_controller"],
-        package_dir = {'swig_isir_controller':'src'},
+        packages    = [package_name],
+        package_dir = {package_name:'src'},
+        package_data = {package_name:['*.so']},
+        cmdclass=cmdclass,
 
         script_args = script_args,
         )
