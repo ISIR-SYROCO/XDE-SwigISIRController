@@ -5,6 +5,7 @@ eigen_lgsm             = pkgconfig("eigen_lgsm", True)
 quadprog               = pkgconfig("quadprog", True)
 orc_framework          = pkgconfig("orc_framework", True)
 orcisir_ISIRController = pkgconfig("orcisir_ISIRController", True)
+isirtaskmanager        = pkgconfig("isirtaskmanager", False)
 xdecore                = pkgconfig("xdecore", False)
 additional             = get_additional_include_dir_from_env()
 
@@ -13,7 +14,10 @@ orocos                 = pkgconfig("orocos-rtt-gnulinux", False)
 # gather all data
 other_swig_opt = []
 other_compiler_args = []
-packages_data = get_packages_data([eigen_lgsm, quadprog, orc_framework, orcisir_ISIRController, additional])
+packages_list = [eigen_lgsm, quadprog, orc_framework, orcisir_ISIRController, additional]
+if isirtaskmanager is not None:
+    packages_list.append(isirtaskmanager)
+packages_data = get_packages_data(packages_list)
 
 
 # check for optional package: xde
@@ -36,6 +40,8 @@ if orocos is not None:
 
 
 
+ext_modules_list = []
+
 # SwigISIRController
 _swig_swig_isir_controller = Extension("_swig_isir_controller",
                    ["src/swig_isir_controller.i"],
@@ -43,7 +49,17 @@ _swig_swig_isir_controller = Extension("_swig_isir_controller",
                    extra_compile_args = ["-fpermissive"] + other_compiler_args,
                    **packages_data #include, libs
                    )
+ext_modules_list.append(_swig_swig_isir_controller)
 
+if isirtaskmanager is not None:
+    # isirtaskmanager
+    _isir_task_manager = Extension("_isir_task_manager", 
+                       ["src/isir_task_manager.i"],
+                       swig_opts = ["-c++"] + ["-I"+p for p in packages_data['include_dirs']] + other_swig_opt,
+                       extra_compile_args = ["-fpermissive"] + other_compiler_args,
+                       **packages_data
+                       )
+    ext_modules_list.append(_isir_task_manager)
 
 
 #to force the package building extension before all we change the script_args list:
@@ -58,7 +74,7 @@ dist = setup(name   = "swig_isir_controller",
         author      = "Joseph Salini",
         url         = 'https://github.com/XDE-ISIR/XDE-SwigISIRController',
         version     = "0.1",
-        ext_modules = [_swig_swig_isir_controller],
+        ext_modules = ext_modules_list,
         packages    = [package_name],
         package_dir = {package_name:'src'},
         package_data = {package_name:['*.so']},

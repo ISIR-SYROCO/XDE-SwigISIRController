@@ -55,6 +55,11 @@ except:
     ProxyCoMFrame     = RemoteCoMFrame     = None
     ProxyTargetFrame  = RemoteTargetFrame  = None
 
+try:
+    from isir_task_manager import TaskXMLParser
+except:
+    print "ISIRTaskManager not installed"
+    TaskXMLParser = None
 
 
 
