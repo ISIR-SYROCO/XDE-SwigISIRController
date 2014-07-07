@@ -7,6 +7,7 @@
 
 #include <ISIRTaskManager/mathutils.hpp>
 #include <ISIRTaskManager/taskxmlparser.hpp>
+#include <ISIRTaskManager/trajectory.hpp>
 
 %}
 
@@ -54,6 +55,7 @@
 
 //%include "ISIRTaskManager/mathutils.hpp"
 %include "ISIRTaskManager/taskxmlparser.hpp"
+%include "ISIRTaskManager/trajectory.hpp"
 
 //Cast function
 %inline %{
@@ -87,5 +89,9 @@
 
     contact_task_t& contactCast(task_t& task){
         return *dynamic_cast<contact_task_t*>(&task);
+    }
+    
+    TrajectoryReaderFullJoint& trajectoryReaderFullJointCast(Trajectory* traj){
+        return *dynamic_cast<TrajectoryReaderFullJoint*>(traj);
     }
 %}
